@@ -1,9 +1,9 @@
 fun main() {
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<String>): Pair<String, String> {
 
         var digits = Array(input[0].length) { Array(2) { 0 } }
         for (line in input) {
-            for ( (bitIndex, bit) in line.withIndex()) {
+            for ((bitIndex, bit) in line.withIndex()) {
                 if (bit.digitToInt() == 1) {
                     digits[bitIndex][1]++
                 } else {
@@ -14,31 +14,75 @@ fun main() {
         var gamma = ""
         var epsilon = ""
         for ((digitIdx, digit) in digits.withIndex()) {
-            println("For bit ${digitIdx}: ones[${digit[1]}], zero[${digit[0]}]")
-            if (digit[0] > digit[1]) {
-                gamma += 0
-                epsilon += 1
-            } else {
-                gamma += 1
-                epsilon += 0
+            when {
+                digit[0] > digit[1] -> {
+                    gamma += 0
+                    epsilon += 1
+                }
+                digit[0] < digit[1] -> {
+                    gamma += 1
+                    epsilon += 0
+                }
             }
         }
-        println("Gamma: $gamma (${gamma.toInt(2)}) and Epsilon $epsilon (${epsilon.toInt(2)})")
-        return gamma.toInt(2) * epsilon.toInt(2)
+        return Pair(gamma, epsilon)
     }
 
+    fun oxygen(input: List<String>): String {
+        var result = input
+        var pos = 0
+        while (result.size != 1) {
+            var (ones, zeros) = arrayOf(0, 0)
+            for (num in result) {
+                if (num[pos].digitToInt() == 1) {
+                    ones++
+                } else {
+                    zeros++
+                }
+            }
+            val filter = if (ones >= zeros) 1 else 0
+            result = result.filter { it -> it[pos] == filter.digitToChar() }
+            pos++
+        }
+        return result[0]
+    }
 
-    fun part2(input: List<String>): Int {
-        return 0
+    fun co2Scrapper(input: List<String>): String {
+        var result = input
+        var pos = 0
+        while (result.size != 1) {
+            var (ones, zeros) = arrayOf(0, 0)
+            for (num in result) {
+                if (num[pos].digitToInt() == 1) {
+                    ones++
+                } else {
+                    zeros++
+                }
+            }
+            val filter = if (ones < zeros) 1 else 0
+            result = result.filter { it[pos] == filter.digitToChar() }
+            pos++
+        }
+        return result[0]
     }
 
 
     // part 1
     val input = readInput("day3_1-input")
-    val part1Result = part1(input)
-    println("The number of increments is $part1Result")
+    val (gamma, epsilon) = part1(input)
+    println("Solution $gamma * $epsilon is ${gamma.toInt(2) * epsilon.toInt(2)}")
 
     // part 2
-    val part2Result = part2(input)
-    println("The number of increments is $part2Result")
+    val oxygenRating = oxygen(input)
+    println("Oxygen generator rating: ${oxygenRating.toInt(2)}")
+
+    val scrubberRating = co2Scrapper(input)
+    println("Co2 rating: ${scrubberRating.toInt(2)}")
+    println(
+        "Life support rating: ${
+            scrubberRating.toInt(2) * oxygenRating.toInt(
+                2
+            )
+        }"
+    )
 }
