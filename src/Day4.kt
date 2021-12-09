@@ -61,7 +61,7 @@ fun load(fileName: String) {
     if (scanner.hasNext()) {
         calls = scanner.nextLine().split(",")
     }
-    val matrixes: MutableList<Array<Array<MarkedNumber>>> = mutableListOf()
+    val boards: MutableList<Board> = mutableListOf()
     while (scanner.hasNext()) {
         scanner.nextLine()
         val matrix: Array<Array<MarkedNumber>> =
@@ -70,22 +70,30 @@ fun load(fileName: String) {
             for (col in 0..4)
                 matrix[row][col] = MarkedNumber(scanner.nextInt(), false)
         }
-        matrixes.add(matrix)
+        boards.add(Board(matrix, false))
         scanner.nextLine()
     }
     scanner.close()
-    println("The winner is: " + roll(calls, matrixes))
+    println("The winner is: " + roll(calls, boards))
 }
 
-fun roll(calls: List<String>?, matrixes: MutableList<Array<Array<MarkedNumber>>>): Int {
+data class Board(val matrix: Array<Array<MarkedNumber>>, var isWon: Boolean)
+
+fun roll(calls: List<String>?, boards: MutableList<Board>): Int {
+    var numOfBoards = boards.size;
     for (call in calls!!) {
-        for (matrix in matrixes) {
+        for (board in boards) {
             for (row in 0..4) {
                 for (col in 0..4) {
+                    val matrix = board.matrix
                     if (matrix[row][col].number == call.toInt()) {
                         matrix[row][col].marked = true
-                        if (checkRow(matrix, row) || checkColumn(matrix, col)) {
-                            return matrixSum(matrix) * call.toInt()
+                        if (!board.isWon && (checkRow(matrix, row) || checkColumn(matrix, col))) {
+                            board.isWon = true
+                            numOfBoards -= 1
+                            if (numOfBoards == 0) {
+                                return matrixSum(matrix) * call.toInt()
+                            }
                         }
                     }
                 }
