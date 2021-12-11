@@ -29,15 +29,19 @@ fun loadCoordinates(fileName: String) {
                 print("($x, ${line.p1.y}) ")
             }
             println()
-        }
-
-        if (line.isVertical()) {
+        } else if (line.isVertical()) {
             println("Vertical")
             val range = line.p1.y.coerceAtMost(line.p2.y).rangeTo(line.p1.y.coerceAtLeast(line.p2.y))
             println(range)
             for (y in range) {
                 plain[line.p1.x][y]++
                 print("(${line.p1.x}, $y) ")
+            }
+        } else {
+            val points = line.getPoints()
+            for (p in points) {
+                plain[p.x][p.y]++
+                print("(${p.x}, ${p.y}) ")
             }
         }
     }
@@ -63,5 +67,26 @@ data class Line(val p1: Point, val p2: Point) {
 
     fun isVertical(): Boolean {
         return p1.x == p2.x
+    }
+
+    fun getPoints(): List<Point> {
+        var xProgression: IntProgression = if (p1.x < p2.x) {
+            p1.x.until(p2.x + 1)
+        } else {
+            p1.x.downTo(p2.x)
+        }
+
+        var yProgression: IntProgression = if (p1.y < p2.y) {
+            p1.y.until(p2.y + 1)
+        } else {
+            p1.y.downTo(p2.y)
+        }
+        val xIter = xProgression.iterator()
+        val yIter = yProgression.iterator()
+        val result = mutableListOf<Point>()
+        while (xIter.hasNext() && yIter.hasNext()) {
+            result.add(Point(xIter.nextInt(), yIter.nextInt()))
+        }
+        return result
     }
 }
